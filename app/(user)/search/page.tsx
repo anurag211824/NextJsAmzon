@@ -4,24 +4,14 @@
 import Link from "next/link";
 import React from "react";
 
-export async function generateMetadata({
-  searchParams,
-}: {
-  searchParams: { category?: string };
-}) {
-  return {
-    title: searchParams?.category || "All",
-    description: "Search products",
-  };
-}
 
 const ProductsPage =async ({ searchParams }) => {
-  const category = searchParams?.category || "";
-
-  const minPrice = Number(await searchParams?.minPrice) || 0;
-  const maxPrice = Number( await searchParams?.maxPrice) || Infinity;
-  const minRating = Number(await searchParams?.minRating) || 0;
-  const sortBy = await searchParams?.sortBy || "none";
+  const params = await searchParams;
+  const category = params?.category || "";
+  const minPrice = Number(params?.minPrice) || 0;
+  const maxPrice = Number(params?.maxPrice) || Infinity;
+  const minRating = Number(params?.minRating) || 0;
+  const sortBy = params?.sortBy || "none";
 
   let products = [];
   if (category) {
@@ -56,8 +46,8 @@ const ProductsPage =async ({ searchParams }) => {
     }
   }
   return (
-    <div className="flex">
-      <aside className="w-64 p-4 border-r">
+    <div className="flex flex-col lg:flex-row">
+      <aside className="w-full lg:w-64 p-4 border-r">
         <h2 className="text-xl font-semibold mb-4">Filters</h2>
         <form method="GET" className="flex flex-col space-y-4">
           <input type="hidden" name="category" value={category} />

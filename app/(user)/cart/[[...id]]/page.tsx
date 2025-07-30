@@ -29,10 +29,10 @@ const Cart = () => {
   }
 
   return (
-    <div className="max-w-[1350px] p-4 mx-auto flex flex-col lg:flex-row gap-10
+    <div className="max-w-[1450px] p-4 mx-auto flex flex-col lg:flex-row gap-10
 ">
         <div className="flex-1">
-        <div className=" grid lg:mt-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="max-w-[1000px] grid lg:mt-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {cart?.map((item: CartItem) => (
             <div
               key={item.id}
@@ -41,7 +41,7 @@ const Cart = () => {
               <img
                 src={item.thumbnail}
                 alt={item.title}
-                className="w-full h-24 object-cover rounded"
+                className="w-full h-48 object-cover rounded"
               />
               <div className="flex-1 w-full">
                 <h3 className="text-lg font-semibold">{item.title}</h3>
@@ -64,7 +64,7 @@ const Cart = () => {
               </div>
               <button
                 onClick={() => dispatch(removeCartItem(item))}
-                className="text-red-500 hover:text-red-700 font-semibold text-left w-full"
+                className="text-red-500 hover:text-red-700 font-semibold text-left w-full "
               >
                 Remove
               </button>

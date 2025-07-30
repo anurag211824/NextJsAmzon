@@ -118,3 +118,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide scrollbar globally for all scrollable elements */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Optional: keep scroll functionality without visual scrollbar */
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}

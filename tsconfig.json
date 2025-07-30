@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/cart/[[...id]]/page.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/(user)/cart/[[...id]]/page.tsx", "app/form-validation/page.tsx"],
   "exclude": ["node_modules"]
 }

@@ -14,18 +14,16 @@ return;
 }
 
 const loadFromLocalStorage = () => {
+  if (typeof window === 'undefined') return []; 
   try {
     const cartData = localStorage.getItem("cart");
-    if (!cartData) return []; 
+    if (!cartData) return [];
     return JSON.parse(cartData);
   } catch (e) {
-    console.error("Failed to load cart from localStorage:", e);
+    console.log(e);
     return [];
   }
 };
-
-
-
 const slice = createSlice({
   name: "cart",
   initialState: loadFromLocalStorage() || [],

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import NavSearch from "../components/NavSearch";
 import ReduxProvider from '@/components/Provider'
+import ConditionalHeader from "@/components/ConditionalHeader";
 
 
 const geistSans = Geist({
@@ -31,7 +31,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
        <ReduxProvider>
-        <NavSearch/>   
+          <ConditionalHeader/>
            {children}
        </ReduxProvider>
       </body>
