@@ -18,7 +18,11 @@ function HeroPage() {
 // Server Component: Fetch + Render
 const Hero = async () => {
   const groupedProducts = await getProductsGroupedByCategory();
+  //console.log(groupedProducts);
+  
   const categoryEntries = Object.entries(groupedProducts);
+  //console.log(categoryEntries);
+  
 
   return (
     <section className="min-h-screen p-10 bg-gray-50">

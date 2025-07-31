@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getAllProducts } from "@/actions/product";
 
 const ProductSearchForm = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -39,21 +40,34 @@ const ProductSearchForm = () => {
 
   useEffect(() => {
     const fetchSuggestions = async () => {
-
+      if (searchQuery.trim().length < 2) {
+        return;
+      }
       setIsLoading(true);
       try {
-        const res = await fetch("https://dummyjson.com/products");
-        const data = await res.json();
+        const products = await getAllProducts();
+        const productSuggestion = products
+          .filter((item) => {
+            const titleMatch = item.title
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase());
+            const brandMatch = item.brand
+              ?.toLocaleLowerCase()
+              .includes(searchQuery.toLowerCase());
+            const tagsMatch = item.tags.some((tag) => {
+              return tag.toLowerCase().includes(searchQuery.toLowerCase());
+            });
+            return titleMatch || brandMatch || tagsMatch;
+          })
+          .map((item) => {
+            return item.title;
+          });
 
-        const productSuggestion = [];
-        data.products.forEach((item) => {
-          if (item.title.toLowerCase().includes(searchQuery.toLowerCase())) {
-            productSuggestion.push(item.title);
-          }
-        });
-
-        setSuggestion(productSuggestion);
-        setDisplaySuggestion(productSuggestion.length > 0);
+        const uniqueProductsSuggestions = Array.from(
+          new Set(productSuggestion)
+        );
+        setSuggestion(uniqueProductsSuggestions);
+        setDisplaySuggestion(uniqueProductsSuggestions.length > 0);
       } catch (error) {
         console.error("Error fetching suggestions:", error);
       } finally {
@@ -66,7 +80,7 @@ const ProductSearchForm = () => {
   }, [searchQuery]);
 
   return (
-   <form onSubmit={handleSubmit} className="relative w-full max-w-2xl">
+    <form onSubmit={handleSubmit} className="relative w-full max-w-2xl">
       <div className="relative">
         {/* Search Input */}
         <div className="relative flex items-center">
@@ -107,7 +121,7 @@ const ProductSearchForm = () => {
 
         {/* Suggestions Dropdown */}
         {displaySuggestion && (
-         <Card className="absolute top-full left-0 right-0 mt-1 z-50 bg-white border max-h-80 overflow-y-auto shadow-lg">
+          <Card className="absolute top-full left-0 right-0 mt-1 z-50 bg-white border max-h-80 overflow-y-auto shadow-lg">
             {isLoading ? (
               <div className="p-4 text-center text-gray-500">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-400 mx-auto"></div>

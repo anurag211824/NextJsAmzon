@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @next/next/no-img-element */
 //@ts-nocheck
+import { getProductByCategory } from "@/actions/product";
 import Link from "next/link";
 import React from "react";
 
-
-const ProductsPage =async ({ searchParams }) => {
+const ProductsPage = async ({ searchParams }) => {
   const params = await searchParams;
   const category = params?.category || "";
   const minPrice = Number(params?.minPrice) || 0;
@@ -13,36 +13,21 @@ const ProductsPage =async ({ searchParams }) => {
   const minRating = Number(params?.minRating) || 0;
   const sortBy = params?.sortBy || "none";
 
-  let products = [];
+  const data = await getProductByCategory(category);
+  let products = data;
   if (category) {
-    try {
-      const res = await fetch(
-        `https://dummyjson.com/products/category/${category}`
-      );
-      const data = await res.json();
-      products = data.products || [];
-      if (products.length === 0) {
-        throw new error();
-      }
-      products.forEach((product) => {
-        product.quantiy = 0;
-      });
-
-      products = products.filter(
-        (product) =>
-          product.price >= minPrice &&
-          product.price <= maxPrice &&
-          product.rating >= minRating
-      );
-      if (sortBy === "price-asc") {
-        products.sort((a, b) => a.price - b.price);
-      } else if (sortBy === "price-desc") {
-        products.sort((a, b) => b.price - a.price);
-      } else if (sortBy === "rating") {
-        products.sort((a, b) => b.rating - a.rating);
-      }
-    } catch (error) {
-      throw new error();
+    products = products.filter(
+      (product) =>
+        product.price >= minPrice &&
+        product.price <= maxPrice &&
+        product.rating >= minRating
+    );
+    if (sortBy === "price-asc") {
+      products.sort((a, b) => a.price - b.price);
+    } else if (sortBy === "price-desc") {
+      products.sort((a, b) => b.price - a.price);
+    } else if (sortBy === "rating") {
+      products.sort((a, b) => b.rating - a.rating);
     }
   }
   return (
@@ -110,7 +95,7 @@ const ProductsPage =async ({ searchParams }) => {
         </h1>
 
         {products.length === 0 ? (
-          <p>No products found for selected filters.</p>
+          <p>No data found for selected filters.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {products.map((product) => (
