@@ -1,13 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-//@ts-nocheck
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { addCartItem } from "@/redux/slice/cartSlice";
 import { useDispatch } from "react-redux";
 import Link from "next/link";
+import { getProductsByTitle } from "@/actions/product";
 
-type titledProduct = {
+type Product = {
   id: number;
   title: string;
   description: string;
@@ -22,29 +22,22 @@ type titledProduct = {
 };
 
 const ProductPageByTitle = () => {
-  const [product, setProduct] = useState< null>(null);
-  const [productByTitle, setProductByTitle] = useState< titledProduct| null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const { title } = useParams();
   const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch("https://dummyjson.com/products?limit=194");
-        const data = await res.json();
-        setProduct(data.products);
-
-        // Find product by title after fetching
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         //@ts-ignore
-        const found = data.products.find(
-          (item: titledProduct) =>
-            item.title.toLowerCase() ===
-            (typeof title === "string"
-              ? decodeURIComponent(title).toLowerCase()
-              : "")
-        );
-        setProductByTitle(found || null);
+        const data =  await getProductsByTitle(decodeURIComponent(title))
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        const product =  Object.entries(data)[0][1]
+           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        setProduct(product)
       } catch (error) {
         console.error("Failed to fetch product", error);
       }
@@ -63,63 +56,61 @@ const ProductPageByTitle = () => {
    <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8 bg-white shadow-md rounded-xl">
   <div className="flex items-center justify-center">
     <img
-      src={productByTitle?.thumbnail || ""}
-      alt={productByTitle?.title || ""}
+      src={product?.thumbnail || ""}
+      alt={product?.title || ""}
       className="w-full max-w-lg object-cover rounded-lg shadow-sm"
     />
   </div>
 
   <div className="flex flex-col justify-center">
     <h1 className="text-3xl font-bold text-gray-900 mb-4">
-      {productByTitle?.title}
+      {product?.title}
     </h1>
 
-    <p className="text-gray-700 mb-4">{productByTitle?.description}</p>
+    <p className="text-gray-700 mb-4">{product?.description}</p>
 
     <div className="text-sm text-gray-600 mb-2">
-      <span className="font-semibold">Brand:</span> {productByTitle?.brand}
+      <span className="font-semibold">Brand:</span> {product?.brand}
     </div>
 
     <div className="text-sm text-gray-600 mb-4">
-      <span className="font-semibold">Category:</span> {productByTitle?.category}
+      <span className="font-semibold">Category:</span> {product?.category}
     </div>
 
     <div className="mb-3">
       <span className="text-2xl font-bold text-green-700">
         $
-        {productByTitle
+        {product
           ? (
-              productByTitle.price -
-              (productByTitle.price * productByTitle.discountPercentage) / 100
+              product.price -
+              (product.price * product.discountPercentage) / 100
             ).toFixed(2)
           : "0.00"}
       </span>
 
       <span className="ml-2 line-through text-gray-500 text-sm">
-        ${productByTitle?.price}
+        ${product?.price}
       </span>
       <span className="ml-2 text-sm text-red-600">
-        ({productByTitle?.discountPercentage}% OFF)
+        ({product.discountPercentage}% OFF)
       </span>
     </div>
 
     <div className="text-yellow-600 font-semibold mb-2">
-      Rating: {productByTitle?.rating} ⭐
+      Rating: {product.rating} ⭐
     </div>
 
     <div
       className={`mb-4 font-medium ${
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore
-        productByTitle?.stock > 0 ? "text-green-600" : "text-red-600"
+        product.stock > 0 ? "text-green-600" : "text-red-600"
       }`}
     > 
-      {(productByTitle?.stock ?? 0) > 0 ? "In Stock" : "Out of Stock"}
+      {(product.stock ?? 0) > 0 ? "In Stock" : "Out of Stock"}
     </div>
 
-    {productByTitle?.tags && productByTitle.tags.length > 0 && (
+    {product.tags && product.tags.length > 0 && (
       <div className="flex flex-wrap gap-2 mb-4">
-        {productByTitle.tags.map((tag, idx) => (
+        {product.tags.map((tag, idx) => (
           <span
             key={idx}
             className="bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full"
@@ -130,8 +121,8 @@ const ProductPageByTitle = () => {
       </div>
     )}
 
-  <Link href={`/cart/${productByTitle?.id}`}>  <button
-      onClick={() => dispatch(addCartItem(productByTitle))}
+  <Link href={`/cart/${product.id}`}>  <button
+      onClick={() => dispatch(addCartItem(product))}
       className="text-white bg-green-500 px-4 py-2 rounded-md w-fit hover:bg-green-600"
     >
       Add To Cart

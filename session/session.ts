@@ -1,4 +1,4 @@
-import { SignJWT, jwtVerify } from 'jose';
+import { SignJWT, jwtVerify } from "jose";
 import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 
@@ -9,15 +9,14 @@ export async function createToken(user) {
   const payload = {
     id: user.id,
     email: user.email,
-    username: user.username
   };
-  
+
   const token = await new SignJWT(payload)
-    .setProtectedHeader({ alg: 'HS256' })
+    .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime('7d')
+    .setExpirationTime("7d")
     .sign(secret);
-    
+
   return token;
 }
 
@@ -26,7 +25,7 @@ export async function decrypt(token: string) {
     const { payload } = await jwtVerify(token, secret);
     return payload;
   } catch (error) {
-    console.log('JWT verification error:', error);
+    console.log("JWT verification error:", error);
     return null;
   }
 }
@@ -41,7 +40,7 @@ export async function getSession() {
     const session = await decrypt(token);
     return session;
   } catch (error) {
-    console.log('Session error:', error);
+    console.log("Session error:", error);
     return null;
   }
 }
@@ -57,7 +56,7 @@ export async function verifyAuth(request: NextRequest) {
     const session = await decrypt(token);
     return session;
   } catch (error) {
-    console.log('Auth verification error:', error);
+    console.log("Auth verification error:", error);
     return null;
   }
 }

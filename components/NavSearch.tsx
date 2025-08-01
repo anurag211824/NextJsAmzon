@@ -2,14 +2,19 @@
 //@ts-nocheck
 "use client";
 import Link from "next/link";
-import { useSelector } from "react-redux";
-import { Badge } from "@/components/ui/badge";
-import { LucideShoppingCart, User } from "lucide-react";
+// import { Badge } from "@/components/ui/badge";
+import { LucideShoppingCart, Shield, User } from "lucide-react";
 import ProductSearchForm from "./ProductSearchForm";
+import { useContext, useState } from "react";
+import { logOutUser } from "@/actions/user";
+import { Button } from "./ui/button";
 
+import { AppContext } from "@/context/Appcontext";
+import { useRouter } from "next/navigation";
 const NavSearch = () => {
-  const cartItems = useSelector((state) => state.cartItems);
-  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const router = useRouter()
+  const [openprofile, setOpenprofile] = useState(false);
+  const { user } = useContext(AppContext);
   return (
     <div className="w-full bg-black text-white">
       <nav className="flex items-center justify-between gap-1 px-2 sm:px-4 py-3 min-h-[60px]">
@@ -51,25 +56,55 @@ const NavSearch = () => {
           <ProductSearchForm />
         </div>
 
-        {/* Cart and User  */}
+        {/* Cart and User and admin */}
         <div className="flex-shrink-0">
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <Link
-              href="/account"
-              className="text-white hover:text-yellow-400 transition-colors p-2"
-            >
-              <User className="h-6 w-6 sm:h-8 sm:w-8" />
-            </Link>
+            <div className="relative flex-1">
+              <User
+                onClick={() => setOpenprofile(!openprofile)}
+                className="h-6 w-6 sm:h-8 sm:w-8 cursor-pointer"
+              />
+
+              {openprofile && (
+                <div className=" flex flex-col gap-2 absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 z-50 p-4">
+                  {user.role === "ADMIN" && (
+                    <Link href="/admin">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700"
+                      >
+                        <Shield className="h-4 w-4 mr-1" />
+                        Admin
+                      </Button>
+                    </Link>
+                  )}
+                  {
+                    user.name !=""  ? (<Button
+                    onClick={() => {
+                      logOutUser();
+                    }}
+                  >
+                    Logout
+                  </Button>)
+                  :
+                   <Button
+                   onClick={()=>router.push("/sign-in")}
+                  >
+                    Login
+                  </Button>
+                  }
+                 
+                  
+                </div>
+              )}
+            </div>
+
             <Link
               href={`/cart`}
               className="relative text-white hover:text-yellow-400 transition-colors p-2"
             >
               <LucideShoppingCart className="h-6 w-6 sm:h-8 sm:w-8" />
-              {totalItems > 0 && (
-                <Badge className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-yellow-400 text-black rounded-full text-xs px-1.5 py-0.5 sm:px-2 sm:py-1 min-w-[18px] h-[18px] sm:min-w-[20px] sm:h-[20px] flex items-center justify-center font-bold">
-                  {totalItems > 99 ? "99+" : totalItems}
-                </Badge>
-              )}
             </Link>
           </div>
         </div>

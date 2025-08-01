@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { addCartItem } from "@/redux/slice/cartSlice";
 import { useDispatch } from "react-redux";
+import { getProductById } from "@/actions/product";
 
 type Product = {
   id: number;
@@ -23,16 +24,22 @@ type Product = {
 const ProductPage = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const { id } = useParams();
+  console.log(id);
+  
   const dispatch = useDispatch();
 
   useEffect(() => {
+   
     if (!id) return;
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`https://dummyjson.com/products/${id}`);
-        const data = await res.json(); // 🛠 added `await`
-        setProduct(data);
-        console.log(data);
+         const productData = await getProductById(id)
+        // const res = await fetch(`https://dummyjson.com/products/${id}`);
+        // const data = await res.json(); // 🛠 added `await`
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        setProduct(productData);
+        console.log(productData);
       } catch (error) {
         console.error("Failed to fetch product", error);
       }

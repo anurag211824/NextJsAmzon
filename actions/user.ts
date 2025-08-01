@@ -1,13 +1,15 @@
 "use server";
 import db from "@/service/prisma";
 import bcrypt from "bcrypt"
-import { createToken } from "@/session/session";
+import { createToken} from "@/session/session";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 interface User {
 name: string;
   email: string;
   password: string;
+  role:string,
 }
 
 export async function signUpUser(userdata: User) {
@@ -29,10 +31,16 @@ export async function signUpUser(userdata: User) {
         name: userdata.name,
         email: userdata.email,
         password: hashedPassword,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        role: userdata.role, 
       },
     });
-    
-    const token = await createToken(createdUser);
+    const userForToken = {
+      id: createdUser.id,
+      email: createdUser.email,
+    };
+    const token = await createToken(userForToken);
     const cookieStore = await cookies();
     cookieStore.set("usertoken", token, {
       httpOnly: true,
@@ -40,7 +48,12 @@ export async function signUpUser(userdata: User) {
       maxAge: 7 * 24 * 60 * 60,
       path: "/",
     });
-    return { success: true, message: "User Created" };
+    return { success: true, message: "User Created", user: {
+        id:createdUser.id,
+        name: createdUser.name,
+        email: createdUser.email,
+        role: createdUser.role
+      } };
   } catch (error) {
     console.log(error);
     return { success: false, message: "Failed to create user" };
@@ -65,7 +78,11 @@ export async function signInUser(userdata: User) {
     if (!isPasswordValid) {
       return { success: false, message: "Invalid Credentials" };
     }
-    const token = await createToken(user);
+    const userForToken = {
+      id: user.id,
+      email: user.email,
+    };
+    const token = await createToken(userForToken);
     const cookieStore = await cookies();
     cookieStore.set("usertoken", token, {
       httpOnly: true,
@@ -75,7 +92,12 @@ export async function signInUser(userdata: User) {
     });
     console.log("Sign in successful for:", user.email);
 
-    return { success: true, message: "Signed in successfully" };
+    return { success: true, message: "Signed in successfully",user: {
+        id:user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      } };
   } catch (error) {
     console.log(error);
     return { success: false, message: "Failed to sign in" };
@@ -84,5 +106,40 @@ export async function signInUser(userdata: User) {
 
 export async function logOutUser() {
   const cookieStore = await cookies();
-  cookieStore.delete('usertoken');
+  const userToken = cookieStore .get("usertoken")?.value;
+  if(userToken){
+ cookieStore.delete('usertoken');
+  redirect("/sign-in")
+  }
+  return
+ 
+}
+
+
+export async function getUserById(userId: string) {
+  try {
+    if (!userId) {
+      return { success: false, message: "User ID is required" };
+    }
+
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      omit: {
+        password: true,
+      },
+    });
+
+    if (!user) {
+      return { success: false, message: "User not found" };
+    }
+
+    return { 
+      success: true, 
+      message: "User found successfully", 
+      user: user 
+    };
+  } catch (error) {
+    console.log(error);
+    return { success: false, message: "Failed to get user" };
+  }
 }

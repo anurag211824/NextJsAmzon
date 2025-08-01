@@ -1,28 +1,37 @@
 "use client";
 
-import React, { useState } from "react";
+import React, {useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signUpUser } from "@/actions/user";
 import { useRouter } from "next/navigation";
-
+import Link from "next/link";
 const SignUpPage = () => {
   const router =  useRouter()
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
+    role:"USER"
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { name, value } = e.target;
+  
+  if (name === "role") {
+    setFormData((prev) => ({
+      ...prev,
+      role: value.toUpperCase() // Convert role input to uppercase
+    }));
+  } else {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
+  }
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +43,8 @@ const SignUpPage = () => {
       if (!result.success) {
         setError(result.message);
       } else {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
        router.push("/")
       }
     } catch (err) {
@@ -132,12 +143,35 @@ const SignUpPage = () => {
               minLength={6}
             />
           </div>
+         <div>
+  <label htmlFor="role" className="block text-sm font-medium mb-1">
+    Role
+  </label>
+  <select
+    id="role"
+    name="role"
+    value={formData.role}
+    onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
+    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+  >
+    <option value="USER">User</option>
+    <option value="ADMIN">Admin</option>
+  </select>
+</div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Creating Account..." : "Sign Up"}
           </Button>
         </form>
+        <div className="mt-2">
+           <p className="mb-2">Already have an account ?</p>
+          <Link href="/sign-in">  <Button className="w-1/4">
+            Sign-In
+          </Button></Link>
+        </div>
+         
       </div>
+      
     </div>
   );
 };

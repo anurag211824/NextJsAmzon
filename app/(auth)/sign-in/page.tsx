@@ -1,12 +1,16 @@
 "use client";
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signInUser } from "@/actions/user";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+// import { useContext } from "react";
+// import { AppContext } from "@/context/Appcontext";
+
 
 const SignInPage = () => {
+  // const {setUser} = useContext(AppContext)
   const router =  useRouter()
   const [formData, setFormData] = useState({
     email: "",
@@ -34,7 +38,7 @@ const SignInPage = () => {
          const result = await signInUser(formData);
          if (!result.success) {
            setError(result.message);
-         } else {
+         } else { 
           router.push("/")
          }
        } catch (err) {
@@ -123,6 +127,11 @@ const SignInPage = () => {
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Signing In..." : "Sign In"}
           </Button>
+
+          <p>Do not have an account ?</p>
+          <Link href="/sign-up">  <Button className="w-1/4">
+            Sign-Up
+          </Button></Link>
         </form>
       </div>
     </div>

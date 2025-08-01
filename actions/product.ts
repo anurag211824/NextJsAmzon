@@ -15,13 +15,10 @@ export async function getProductsGroupedByCategory() {
 
   return grouped;
 }
-
-export async function getAllProducts(){
-    const products = db.product.findMany()
-    return products;
+export async function getAllProducts() {
+  const products = db.product.findMany();
+  return products;
 }
-
-
 
 export async function getProductByCategory(category: string) {
   try {
@@ -40,6 +37,41 @@ export async function getProductByCategory(category: string) {
     return null;
   }
 }
+
+export async function getProductById(id) {
+  try {
+    const product = await db.product.findUnique({
+      where: {
+        id:id
+      },
+    });
+    return product;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+export async function getProductsByTitle(title: string) {
+  try {
+    const products = await db.product.findMany({
+      where: {
+        title: {
+          equals: title,
+          mode: "insensitive", // case-insensitive match
+        },
+      },
+    });
+
+    return products;
+  } catch (error) {
+    console.error("Failed to fetch products by title:", error);
+    return null;
+  }
+}
+
+
+
 
 
 

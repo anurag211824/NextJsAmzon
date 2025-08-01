@@ -99,8 +99,7 @@ const ProductsPage = async ({ searchParams }) => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {products.map((product) => (
-              <Link href={`/product/${product.id}`} key={product.id}>
-                <div className="border p-4 rounded shadow">
+                <div key={product.id} className="border p-4 rounded shadow">
                   <img
                     src={product.thumbnail}
                     alt={product.title}
@@ -118,7 +117,7 @@ const ProductsPage = async ({ searchParams }) => {
                     View Product
                   </Link>
                 </div>
-              </Link>
+              
             ))}
           </div>
         )}

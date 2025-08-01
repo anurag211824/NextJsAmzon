@@ -14,8 +14,6 @@ function HeroPage() {
     </Suspense>
   );
 }
-
-// Server Component: Fetch + Render
 const Hero = async () => {
   const groupedProducts = await getProductsGroupedByCategory();
   //console.log(groupedProducts);
@@ -25,7 +23,7 @@ const Hero = async () => {
   
 
   return (
-    <section className="min-h-screen p-10 bg-gray-50">
+    <section className="min-h-screen p-10 max-w-[1300px] w-full mx-auto">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
         {categoryEntries.map(([categoryName, products], index) => (
           <Link href={`/search?category=${categoryName}`} key={index}>
