@@ -2,9 +2,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { addCartItem } from "@/redux/slice/cartSlice";
-import { useDispatch } from "react-redux";
-import Link from "next/link";
 import { getProductsByTitle } from "@/actions/product";
 
 type Product = {
@@ -24,7 +21,6 @@ type Product = {
 const ProductPageByTitle = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const { title } = useParams();
-  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -121,12 +117,11 @@ const ProductPageByTitle = () => {
       </div>
     )}
 
-  <Link href={`/cart/${product.id}`}>  <button
-      onClick={() => dispatch(addCartItem(product))}
+  <button
       className="text-white bg-green-500 px-4 py-2 rounded-md w-fit hover:bg-green-600"
     >
       Add To Cart
-    </button></Link>
+    </button>
   </div>
 </div>
 

@@ -17,6 +17,7 @@ export async function GET() {
         user: {
           name: userResponse.user.name,
           role: userResponse.user.role,
+          id:userResponse.user.id
         }
       });
     }

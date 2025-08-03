@@ -8,16 +8,19 @@ import ProductSearchForm from "./ProductSearchForm";
 import { useContext, useState } from "react";
 import { logOutUser } from "@/actions/user";
 import { Button } from "./ui/button";
-
 import { AppContext } from "@/context/Appcontext";
 import { useRouter } from "next/navigation";
+
 const NavSearch = () => {
-  const router = useRouter()
+  const router = useRouter();
   const [openprofile, setOpenprofile] = useState(false);
-  const { user } = useContext(AppContext);
+  const { user, setUser } = useContext(AppContext);
   return (
     <div className="w-full bg-black text-white">
       <nav className="flex items-center justify-between gap-1 px-2 sm:px-4 py-3 min-h-[60px]">
+        <p>{user.name}</p>
+        <p>{user.role}</p>
+        <p>{user.id}</p>
         {/* Logo */}
         <div className="flex items-center flex-shrink-0">
           <Link href="/">
@@ -79,23 +82,24 @@ const NavSearch = () => {
                       </Button>
                     </Link>
                   )}
-                  {
-                    user.name !=""  ? (<Button
-                    onClick={() => {
-                      logOutUser();
-                    }}
-                  >
-                    Logout
-                  </Button>)
-                  :
-                   <Button
-                   onClick={()=>router.push("/sign-in")}
-                  >
-                    Login
-                  </Button>
-                  }
-                 
-                  
+                  {user.name != "" ? (
+                    <Button
+                      onClick={() => {
+                        setUser({
+                          name: "",
+                          role: "",
+                          id: "",
+                        });
+                        logOutUser();
+                      }}
+                    >
+                      Logout
+                    </Button>
+                  ) : (
+                    <Button onClick={() => router.push("/sign-in")}>
+                      Login
+                    </Button>
+                  )}
                 </div>
               )}
             </div>

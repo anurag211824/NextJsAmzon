@@ -1,11 +1,12 @@
 "use client";
 
-import React, {useState } from "react";
+import React, {useContext, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signUpUser } from "@/actions/user";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { AppContext } from "@/context/Appcontext";
 const SignUpPage = () => {
   const router =  useRouter()
   const [formData, setFormData] = useState({
@@ -16,6 +17,9 @@ const SignUpPage = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  const {setUser} = useContext(AppContext)
 
 const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   const { name, value } = e.target;
@@ -45,6 +49,11 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       } else {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         //@ts-ignore
+      setUser({
+          name:result.user?.name,
+          role:result.user?.role,
+          id:result.user?.id,
+        })
        router.push("/")
       }
     } catch (err) {

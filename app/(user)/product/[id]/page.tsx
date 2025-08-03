@@ -3,8 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { addCartItem } from "@/redux/slice/cartSlice";
-import { useDispatch } from "react-redux";
 import { getProductById } from "@/actions/product";
 
 type Product = {
@@ -26,7 +24,7 @@ const ProductPage = () => {
   const { id } = useParams();
   console.log(id);
   
-  const dispatch = useDispatch();
+
 
   useEffect(() => {
    
@@ -115,7 +113,6 @@ const ProductPage = () => {
         )}
 
         <button
-          onClick={() => dispatch(addCartItem(product))}
           className="text-white bg-green-500 px-4 py-2 rounded-md w-fit hover:bg-green-600"
         >
           <Link href={`/cart/${product.id}`}>Add To Cart</Link>

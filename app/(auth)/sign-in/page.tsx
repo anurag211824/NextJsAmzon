@@ -5,13 +5,15 @@ import { Input } from "@/components/ui/input";
 import { signInUser } from "@/actions/user";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-// import { useContext } from "react";
-// import { AppContext } from "@/context/Appcontext";
 
+import { useContext } from "react";
+import { AppContext } from "@/context/Appcontext";
 
 const SignInPage = () => {
-  // const {setUser} = useContext(AppContext)
-  const router =  useRouter()
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  const { setUser } = useContext(AppContext);
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -29,25 +31,29 @@ const SignInPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-       setIsLoading(true);
-       setError("");
-   
-       try {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore
-         const result = await signInUser(formData);
-         if (!result.success) {
-           setError(result.message);
-         } else { 
-          router.push("/")
-         }
-       } catch (err) {
-         console.log(err);
-         setError("Something went wrong. Please try again.");
-       } finally {
-         setIsLoading(false);
-       }
-   
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      const result = await signInUser(formData);
+      if (!result.success) {
+        setError(result.message);
+      } else {
+        setUser({
+          name: result.user?.name,
+          role: result.user?.role,
+          id: result.user?.id,
+        });
+        router.push("/");
+      }
+    } catch (err) {
+      console.log(err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -129,9 +135,10 @@ const SignInPage = () => {
           </Button>
 
           <p>Do not have an account ?</p>
-          <Link href="/sign-up">  <Button className="w-1/4">
-            Sign-Up
-          </Button></Link>
+          <Link href="/sign-up">
+            {" "}
+            <Button className="w-1/4">Sign-Up</Button>
+          </Link>
         </form>
       </div>
     </div>

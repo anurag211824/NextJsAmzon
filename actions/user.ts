@@ -4,6 +4,7 @@ import bcrypt from "bcrypt"
 import { createToken} from "@/session/session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { getSession } from "@/session/session";
 
 interface User {
 name: string;
@@ -106,7 +107,7 @@ export async function signInUser(userdata: User) {
 
 export async function logOutUser() {
   const cookieStore = await cookies();
-  const userToken = cookieStore .get("usertoken")?.value;
+  const userToken = cookieStore.get("usertoken")?.value;
   if(userToken){
  cookieStore.delete('usertoken');
   redirect("/sign-in")
@@ -143,3 +144,28 @@ export async function getUserById(userId: string) {
     return { success: false, message: "Failed to get user" };
   }
 }
+export async function getUser() {
+  try {
+    const userDecrypted = await getSession();
+    if (!userDecrypted?.id) {
+      return {sucess:false,message:"user not found"}
+    }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    const userResponse = await getUserById(userDecrypted.id);
+    if (userResponse.success && userResponse.user) {
+      return { 
+        success: true, 
+        user: {
+          name: userResponse.user.name,
+          role: userResponse.user.role,
+          id:userResponse.user.id,
+          }
+        };
+      }
+      return { success: false, message: "User not found" };
+    } catch (error) {
+      console.log(error);
+      return { success: false, message: "Failed to get user" };
+    }
+  }

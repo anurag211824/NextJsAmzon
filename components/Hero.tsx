@@ -4,7 +4,6 @@
 import Link from "next/link";
 import React, { Suspense } from "react";
 import { getProductsGroupedByCategory } from "@/actions/product";
-import Image from "next/image";
 import { HeroSkeletonGrid } from "./ui/skeleton";
 
 function HeroPage() {
@@ -36,18 +35,13 @@ const Hero = async () => {
 
               <div className="grid grid-cols-2 gap-4 p-4">
                 {products.slice(0, 4).map((product, i) => (
-                  <Image
+                  <img
                     key={i}
                     src={product.thumbnail}
                     alt={product.title}
-                    width={200}
-                    height={200}
+                    
                     className="w-[200px] h-[200px] object-cover"
-                    placeholder="blur"
-                    blurDataURL="/placeholder.png"
-                    quality={75}
-                    priority={false}
-                    loading="lazy"
+                  
                   />
                 ))}
               </div>
