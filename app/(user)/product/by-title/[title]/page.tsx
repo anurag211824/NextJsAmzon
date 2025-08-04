@@ -1,8 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getProductsByTitle } from "@/actions/product";
+import { AppContext } from "@/context/Appcontext";
+import { AddTocart } from "@/actions/cart";
 
 type Product = {
   id: number;
@@ -21,7 +23,10 @@ type Product = {
 const ProductPageByTitle = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const { title } = useParams();
-
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  const {user,fetchCartItems} = useContext(AppContext)
+ 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -47,6 +52,30 @@ const ProductPageByTitle = () => {
   if (!product) {
     return <div className="p-4">Loading product details...</div>;
   }
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+   const handleadddTocart = async (ProductId) => {
+      // Add validation to check if user exists and has a valid ID
+      if (!user || !user.id || user.id.trim() === "") {
+        console.error("User not logged in or invalid user ID");
+        return;
+      }
+  
+      if (!ProductId ||ProductId.toString().trim() === "") {
+        console.error("Invalid product ID");
+        return;
+      }
+  
+      try {
+        const res = await AddTocart(user.id, ProductId);
+        if (res.success) {
+          fetchCartItems()
+          console.log(res.cartItem);
+        }
+      } catch (error) {
+        console.error("Failed to add item to cart:", error);
+      }
+    };
 
   return (
    <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8 bg-white shadow-md rounded-xl">
@@ -118,6 +147,7 @@ const ProductPageByTitle = () => {
     )}
 
   <button
+   onClick={()=>handleadddTocart(product.id)}
       className="text-white bg-green-500 px-4 py-2 rounded-md w-fit hover:bg-green-600"
     >
       Add To Cart

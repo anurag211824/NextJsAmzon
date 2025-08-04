@@ -5,22 +5,27 @@ import Link from "next/link";
 // import { Badge } from "@/components/ui/badge";
 import { LucideShoppingCart, Shield, User } from "lucide-react";
 import ProductSearchForm from "./ProductSearchForm";
-import { useContext, useState } from "react";
 import { logOutUser } from "@/actions/user";
 import { Button } from "./ui/button";
-import { AppContext } from "@/context/Appcontext";
 import { useRouter } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
+import { AppContext } from "@/context/Appcontext";
 
 const NavSearch = () => {
   const router = useRouter();
   const [openprofile, setOpenprofile] = useState(false);
-  const { user, setUser } = useContext(AppContext);
+  const { user,cartQuantity,fetchCartItems} = useContext(AppContext);
+
+  useEffect(()=>{
+  fetchCartItems()
+  
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[])
+
   return (
     <div className="w-full bg-black text-white">
       <nav className="flex items-center justify-between gap-1 px-2 sm:px-4 py-3 min-h-[60px]">
-        <p>{user.name}</p>
-        <p>{user.role}</p>
-        <p>{user.id}</p>
+  
         {/* Logo */}
         <div className="flex items-center flex-shrink-0">
           <Link href="/">
@@ -85,21 +90,18 @@ const NavSearch = () => {
                   {user.name != "" ? (
                     <Button
                       onClick={() => {
-                        setUser({
-                          name: "",
-                          role: "",
-                          id: "",
-                        });
                         logOutUser();
                       }}
                     >
                       Logout
                     </Button>
+                    
                   ) : (
                     <Button onClick={() => router.push("/sign-in")}>
                       Login
                     </Button>
                   )}
+                 <p className="text-black"> {user.name}</p>
                 </div>
               )}
             </div>
@@ -108,6 +110,11 @@ const NavSearch = () => {
               href={`/cart`}
               className="relative text-white hover:text-yellow-400 transition-colors p-2"
             >
+              {cartQuantity > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                  {cartQuantity}
+                </span>
+              )}
               <LucideShoppingCart className="h-6 w-6 sm:h-8 sm:w-8" />
             </Link>
           </div>

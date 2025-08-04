@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @next/next/no-img-element */
+//@ts-nocheck
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
 import { getProductById } from "@/actions/product";
+import { AddTocart } from "@/actions/cart";
+import { AppContext } from "@/context/Appcontext";
 
 type Product = {
   id: number;
@@ -21,19 +24,18 @@ type Product = {
 
 const ProductPage = () => {
   const [product, setProduct] = useState<Product | null>(null);
+
   const { id } = useParams();
   console.log(id);
-  
-
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  const { user,fetchCartItems} = useContext(AppContext);
 
   useEffect(() => {
-   
     if (!id) return;
     const fetchProduct = async () => {
       try {
-         const productData = await getProductById(id)
-        // const res = await fetch(`https://dummyjson.com/products/${id}`);
-        // const data = await res.json(); // 🛠 added `await`
+        const productData = await getProductById(id);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         //@ts-ignore
         setProduct(productData);
@@ -44,12 +46,48 @@ const ProductPage = () => {
     };
     fetchProduct();
   }, [id]);
+  const handleadddTocart = async () => {
+    // Add validation to check if user exists and has a valid ID
+    if (!user || !user.id || user.id.trim() === "") {
+      console.error("User not logged in or invalid user ID");
+      return;
+    }
+
+    if (!id || id.toString().trim() === "") {
+      console.error("Invalid product ID");
+      return;
+    }
+
+    try {
+      const res = await AddTocart(user.id, id);
+      if (res.success) {
+        fetchCartItems()
+        console.log(res.cartItem);
+      }
+    } catch (error) {
+      console.error("Failed to add item to cart:", error);
+    }
+  };
 
   if (!product) {
     return <div className="p-4">Loading product details...</div>;
   }
+
+  // Add check for user before showing add to cart button
+  if (!user || !user.id) {
+    return (
+      <div className="max-w-6xl mt-5 mx-auto p-6 bg-white shadow-md rounded-xl">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">
+            Please log in to view product details and add items to cart.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8 bg-white shadow-md rounded-xl">
+    <div className="max-w-6xl mt-5 mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8 bg-white shadow-md rounded-xl">
       <div className="flex items-center justify-center">
         <img
           src={product.thumbnail}
@@ -113,9 +151,10 @@ const ProductPage = () => {
         )}
 
         <button
+          onClick={handleadddTocart}
           className="text-white bg-green-500 px-4 py-2 rounded-md w-fit hover:bg-green-600"
         >
-          <Link href={`/cart/${product.id}`}>Add To Cart</Link>
+          Add To Cart
         </button>
       </div>
     </div>

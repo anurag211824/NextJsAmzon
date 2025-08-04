@@ -7,13 +7,14 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
 model User {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   email     String   @unique
   password  String
   role      Role     @default(USER)
-  carts     Cart[]
+  cart      Cart?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -29,28 +30,30 @@ model Product {
   description        String
   brand              String?
   category           String
-  price              Float 
+  price              Float
   originalPrice      Float
   discountPercentage Float
   rating             Float
   availabilityStatus String
   tags               String[]
   thumbnail          String
+  CartItem           CartItem[]
 }
 
 model Cart {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  user      User      @relation(fields: [userId], references: [id])
-  userId    String    @db.ObjectId
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String     @unique @db.ObjectId
+  user      User       @relation(fields: [userId], references: [id])
   items     CartItem[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
 
 model CartItem {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  cart      Cart     @relation(fields: [cartId], references: [id])
-  cartId    String   @db.ObjectId
-  productId String   @db.ObjectId
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  cartId    String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
+  productId String  @db.ObjectId
   quantity  Int
 }

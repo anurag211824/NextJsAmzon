@@ -9,10 +9,12 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const session = await verifyAuth(request);
+  // to Boolean to explixt type cast object into true false
   const isAuthenticated = Boolean(session);
 
   if (protectedRoutes.some((route) => pathname.startsWith(route))) {
     if (!isAuthenticated) {
+      //https:localhost
       console.log(request.nextUrl.origin);
       
       const signInUrl = new URL("/sign-in", request.nextUrl.origin);
